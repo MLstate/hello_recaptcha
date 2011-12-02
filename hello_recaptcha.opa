@@ -223,17 +223,20 @@ module Recaptcha
                  , ("response",   response)
                  ]
           /**Handle POST failures, decode reCaptcha responses, convert this to [reCaptcha.result].*/
-          function with_result(res) {
-            match (res) {
-              case ~{failure}: { callback({failure: {captcha_not_reachable: failure}}) }
-              case ~{success}: {
+          function with_result(res)
+          {
+            match (res)
+            {
+              case ~{failure}:
+                callback({failure: {captcha_not_reachable: failure}})
+              case ~{success}:
                 details = String.explode("\n", success.content)
-                match (details) {
-                  case ["true" | _]: {callback({success: {captcha_solved}})}
-                  case ["false", code | _]: {callback({failure: {upstream: code}})}
-                  case _: {callback({failure: {unknown: details}})}
+                match (details)
+                {
+                  case ["true" | _]: callback({success: {captcha_solved}})
+                  case ["false", code | _]: callback({failure: {upstream: code}})
+                  default: callback({failure: {unknown: details}})
                 }
-              }
             }
           }
           /**Encode arguments, POST them*/

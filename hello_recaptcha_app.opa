@@ -20,8 +20,8 @@ server private config =
  */
 function after_validation(res) {
   match (res) {
-    case {success: _}: { #status = <>success</> }
-    case {failure: _}: { #status = <>failure</> }
+    case {success: _}: #status = <>success</>
+    case {failure: _}: #status = <>failure</>
   }
 }
 
