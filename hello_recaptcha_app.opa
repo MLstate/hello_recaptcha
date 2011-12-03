@@ -38,8 +38,5 @@ function page() {
 /**
  * Main application.
  */
-Server.start(Server.http,
-  Server.simple({title: "Hello, Recaptcha", ~page})
-)
-
+Server.start(Server.http, {title: "Hello, Recaptcha", ~page})
 

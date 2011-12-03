@@ -72,7 +72,7 @@ type Recaptcha.config =
 /**
  * An abstract object implementing the methods of the reCaptcha.
  */
-abstract type Recaptcha.implementation = {
+@abstract type Recaptcha.implementation = {
      /**Place a request to the reCaptcha server to verify that user entry is correct.
         @param challenge
         @param response
