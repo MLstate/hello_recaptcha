@@ -26,7 +26,6 @@ import stdlib.web.client
 
 type Recaptcha.config =
 {
-
    {
      /**
       * The private access key to the service.
@@ -72,7 +71,7 @@ type Recaptcha.config =
 /**
  * An abstract object implementing the methods of the reCaptcha.
  */
-@abstract type Recaptcha.implementation = {
+abstract type Recaptcha.implementation = {
      /**Place a request to the reCaptcha server to verify that user entry is correct.
         @param challenge
         @param response
@@ -115,11 +114,10 @@ module Recaptcha
     * to validate an entry, reload the reCaptcha, etc. and a [xhtml] extract which should be
     * inserted in a page to display the captcha dialog.
     */
-   function (Recaptcha.implementation, xhtml) make(Recaptcha.config config)
-   {
-     id = Dom.fresh_id()
-     xhtml = <div id={id} onready={function(_) { onready(id, config.cfg_public.pubkey, config.cfg_public.theme?"red") }}/>
-     (make_implementation(config.cfg_private.privkey), xhtml)
+   function (Recaptcha.implementation, xhtml) make(Recaptcha.config config) {
+       id = Dom.fresh_id();
+       xhtml = <div id={id} onready={function(_) { onready(id, config.cfg_public.pubkey, config.cfg_public.theme?"red") }}/>;
+       (make_implementation(config.cfg_private.privkey), xhtml);
    }
 
    /**
@@ -131,10 +129,9 @@ module Recaptcha
     * @param implementation A reCaptcha.
     * @param callback A function which will be called once the server has provided an answer
     */
-   function void validate(Recaptcha.implementation implementation, (Recaptcha.result -> void) callback)
-   {
-      t = get_token()
-      implementation.validate(t.challenge, t.response, callback)
+   function void validate(Recaptcha.implementation implementation, (Recaptcha.result -> void) callback) {
+       t = get_token();
+       implementation.validate(t.challenge, t.response, callback);
    }
 
    /**
@@ -142,9 +139,8 @@ module Recaptcha
     *
     * @param implementation A reCaptcha.
     */
-   function void reload(Recaptcha.implementation implementation)
-   {
-     implementation.reload()
+   function void reload(Recaptcha.implementation implementation) {
+       implementation.reload();
    }
 
    /**
@@ -155,9 +151,8 @@ module Recaptcha
     *
     * @param implementation A reCaptcha.
     */
-   function void destroy(Recaptcha.implementation implementation)
-   {
-     implementation.destroy()
+   function void destroy(Recaptcha.implementation implementation) {
+       implementation.destroy();
    }
 
    /**
@@ -183,12 +178,10 @@ module Recaptcha
     * @param pubkey The public key for this reCaptcha.
     * @param theme The name of the theme for this reCaptcha (in case of doubt, "red" is a good choice).
     */
-   private function void onready(string id, string pubkey, string theme)
-   {
+   private function void onready(string id, string pubkey, string theme) {
       Client.Script.load_uri_then(path_js_uri,
-        function()
-        {
-          (%% Recaptcha.init %%)(id, pubkey, theme)
+        function(){
+            (%% Recaptcha.init %%)(id, pubkey, theme);
         }
       )
    }
@@ -205,59 +198,50 @@ module Recaptcha
     * @param privkey The private key.
     * @return An object containing the necessary methods to contact the reCaptcha server.
     */
-   private function Recaptcha.implementation make_implementation(string privkey)
-   {
-      function validate(challenge, response, (Recaptcha.result -> void) callback)
-      {
+   private function Recaptcha.implementation make_implementation(string privkey) {
+      function validate(challenge, response, (Recaptcha.result -> void) callback) {
         //By convention, do not even post a request if the data is empty
-        if (String.is_empty(challenge) || String.is_empty(response))
-        {
-          callback({failure: {empty_answer}})
-        }
-        else
-        {
+        if (String.is_empty(challenge) || String.is_empty(response)) {
+            callback({failure: {empty_answer}});
+        } else {
           /**POST request, formatted as per API specifications*/
           data = [ ("privatekey", privkey)
                  , ("remoteip",   "{HttpRequest.get_ip()?(127.0.0.1)}")
                  , ("challenge",  challenge)
                  , ("response",   response)
-                 ]
+                 ];
           /**Handle POST failures, decode reCaptcha responses, convert this to [reCaptcha.result].*/
-          function with_result(res)
-          {
-            match (res)
-            {
+          function with_result(res) {
+              match (res) {
               case ~{failure}:
-                callback({failure: {captcha_not_reachable: failure}})
+                  callback({failure: {captcha_not_reachable: failure}});
               case ~{success}:
-                details = String.explode("\n", success.content)
-                match (details)
-                {
-                  case ["true" | _]: callback({success: {captcha_solved}})
-                  case ["false", code | _]: callback({failure: {upstream: code}})
-                  default: callback({failure: {unknown: details}})
-                }
-            }
+                  details = String.explode("\n", success.content);
+                  match (details) {
+                  case ["true" | _]: callback({success: {captcha_solved}});
+                  case ["false", code | _]: callback({failure: {upstream: code}});
+                  default: callback({failure: {unknown: details}});
+                  }
+              }
           }
-          /**Encode arguments, POST them*/
-          WebClient.Post.try_post_with_options_async(path_validate_uri,
+            /**Encode arguments, POST them*/
+            WebClient.Post.try_post_with_options_async(path_validate_uri,
                 WebClient.Post.of_form({WebClient.Post.default_options with content: {some: data}}),
-                with_result)
+                with_result);
         }
       }
-      {~validate, reload:cl_reload, destroy:cl_destroy}
+      {~validate, reload:cl_reload, destroy:cl_destroy};
    }
 
    /**
     * Grab all necessary information from the user interface.
     */
-   private function {string challenge, string response} get_token()
-   {
-     result = ({ challenge: (%%Recaptcha.get_challenge%%)()
-               , response: (%%Recaptcha.get_response%%)()
-               })
-     (%%Recaptcha.destroy%%)()
-     result
+   private function {string challenge, string response} get_token() {
+       result = ({ challenge: (%%Recaptcha.get_challenge%%)()
+                   , response: (%%Recaptcha.get_response%%)()
+                 });
+       (%%Recaptcha.destroy%%)();
+       result;
    }
 
 }

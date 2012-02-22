@@ -20,23 +20,23 @@ server protected config =
  */
 function after_validation(res) {
   match (res) {
-    case {success: _}: #status = <>success</>
-    case {failure: _}: #status = <>failure</>
+    case { success: _ }: #status = <>success</>;
+    case { failure: _ }: #status = <>failure</>;
   }
 }
 
 function page() {
-  (implementation, recaptcha) = Recaptcha.make(config)
+  (implementation, recaptcha) = Recaptcha.make(config);
   <div>
     Are you a human being?<br />
     {recaptcha}
     <button onclick={function(_) { Recaptcha.validate(implementation, after_validation)}}> Submit </button>
     <div id=#status></div>
-  </div>
+  </div>;
 }
 
 /**
  * Main application.
  */
-Server.start(Server.http, {title: "Hello, Recaptcha", ~page})
+Server.start(Server.http, {title: "Hello, Recaptcha", ~page});
 
