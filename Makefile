@@ -1,3 +1,6 @@
+OPA ?= opa
+OPA_PLUGIN_BUILDER ?= opa-plugin-builder
+
 hello_recaptcha_app.exe: recaptcha.opp hello_recaptcha.opa hello_recaptcha_app.opa
 	$(OPA) $^
 

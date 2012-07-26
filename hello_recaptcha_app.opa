@@ -4,7 +4,7 @@ import tutorial.recaptcha
  * A test configuration for the reCaptcha, based on a public/private key pair
  * registered for "example.com".
  */
-server protected config =
+server private config =
 {
   cfg_private: {
     privkey: "6LdVTcQSAAAAAJGuyHbunFigtJ1HuI1nkVtwAahg"
