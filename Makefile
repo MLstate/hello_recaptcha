@@ -1,8 +1,8 @@
 OPA ?= opa
-OPA_PLUGIN_BUILDER ?= opa-plugin-builder
 
-hello_recaptcha_app.exe: recaptcha.opp hello_recaptcha.opa hello_recaptcha_app.opa
+hello_recaptcha_app.js: recaptcha.js hello_recaptcha.opa hello_recaptcha_app.opa
 	$(OPA) $^
 
-recaptcha.opp: recaptcha.js
-	$(OPA_PLUGIN_BUILDER) recaptcha.js -o recaptcha
+clean:
+	rm -rf *.opp*
+	rm -Rf hello_recaptcha_app_depends hello_recaptcha_app.js
