@@ -9,6 +9,6 @@ Compile with:
 
 Run with:
 
-`./hello_recaptcha_app.exe`
+`./hello_recaptcha_app.js`
 
-More about this example in Opa manual, chapter [Hello, reCaptcha, and the rest of the world](http://doc.opalang.org/manual/Hello--reCaptcha--and-the-rest-of-the-world).
+More about this example in Opa manual, chapter [Hello, reCaptcha, and the rest of the world](https://github.com/MLstate/opalang/wiki/Hello%2C-reCaptcha%2C-and-the-rest-of-the-world).
