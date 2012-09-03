@@ -1,5 +1,5 @@
 /*
-    Copyright © 2011 MLstate
+    Copyright © 2011, 2012 MLstate
 
     This file is part of OPA.
 
@@ -17,6 +17,8 @@
 */
 //Implement [Client.load]
 //reCaptcha: api/recaptcha
+
+import stdlib.web.client
 
 bug = {true} //Replace by {false} to obtain something that works
 
@@ -43,7 +45,7 @@ type Recaptcha.config =
    }
 }
 
-type Recaptcha.validator = private((string, string, (Recaptcha.result -> void) -> void))
+@abstract type Recaptcha.validator = (string, string, (Recaptcha.result -> void) -> void)
 
 Recaptcha =
 {{
@@ -57,7 +59,7 @@ Recaptcha =
    validate(validator: Recaptcha.validator, callback: Recaptcha.result -> void): void =
    (
       (a, b) = get_token()
-      @unwrap(validator)(a, b, callback)
+      validator(a, b, callback)
    )
 
    @private path_api_uri = Option.get(Parser.try_parse(Uri.uri_parser, "http://www.google.com/recaptcha/api/verify"))
@@ -81,7 +83,7 @@ Recaptcha =
         else
         (
           data = [("privatekey", privkey),
-                  ("remoteip",   "{HttpRequest.get_ip(Option.get(thread_context().request))}"),
+                  ("remoteip",   "{HttpRequest.Generic.get_ip(Option.get(thread_context().request))}"),
                   ("challenge",  challenge),
                   ("response",   response)]
           with_result =
@@ -103,7 +105,7 @@ Recaptcha =
                              // <= this version works, callback is called but cannot perform server->client calls
         )
       )
-      @wrap(payload)
+      payload
    )
    @private get_token(): (string, string) =
    (
@@ -125,10 +127,11 @@ config = {
 
 after_validation =
   | {success = _} ->
-                     do Log.info("Success", "success")
-                  Dom.transform([#status <- <>success</>])
-  | {~failure}    -> do Log.info("Failure", failure)
-                  Dom.transform([#status <- <>failure</>])
+    do Log.info("Success", "success")
+    Dom.transform([#status <- <>success</>])
+  | {~failure}    ->
+    do Log.info("Failure", "failure")
+    Dom.transform([#status <- <>failure</>])
 
 server = one_page_server("Hi", ->
   (validator, recaptcha) = Recaptcha.make(config)
@@ -138,3 +141,4 @@ server = one_page_server("Hi", ->
      <div id=#status></div>
   </div>
 )
+
