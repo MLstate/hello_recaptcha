@@ -1,5 +1,7 @@
-##register init: string, string, string -> void
-##args(id, pubkey, theme)
+/**
+ * @register {string, string, string -> void}
+ */
+function init(id, pubkey, theme)
 {
   Recaptcha.create(pubkey,
       id,
@@ -10,26 +12,34 @@
   );
 }
 
-##register get_challenge: -> string
-##args()
+/**
+ * @register{-> string}
+ */
+function get_challenge()
 {
     return (Recaptcha.get_challenge()||"")
 }
 
-##register get_response: -> string
-##args()
+/**
+ * @register {-> string}
+ */
+function get_response()
 {
     return (Recaptcha.get_response()||"")
 }
 
-##register destroy: -> void
-##args()
+/**
+ * @register {-> void}
+ */
+function destroy()
 {
     Recaptcha.destroy();
 }
 
-##register reload: -> void
-##args()
+/**
+ * @register { -> void}
+ */
+function reload()
 {
     Recaptcha.reload();
 }
